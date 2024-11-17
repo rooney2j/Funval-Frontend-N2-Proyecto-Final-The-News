@@ -36,4 +36,4 @@ yarn-error.log*
 next-env.d.ts
 
 # Evitar subir cambios en la página inicial
-app/page.jsx
+# app/page.jsx
