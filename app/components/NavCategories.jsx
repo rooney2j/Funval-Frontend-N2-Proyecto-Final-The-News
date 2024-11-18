@@ -10,8 +10,8 @@ export default function NavCategories() {
   }, [])
   
   return (
-    <nav className='overflow-x-scroll no-scrollbar'>
-        <ul className='py-3 flex justify-evenly gap-5 text-xs md:text-sm'>
+    <nav className='w-full h-full'>
+        <ul className='py-3 flex justify-evenly md:gap-5 text-xs md:text-sm'>
           {
             categories.map((category, index) => (
               <li key={index} className='capitalize font-semibold md:font-normal cursor-pointer'>{category}</li>
