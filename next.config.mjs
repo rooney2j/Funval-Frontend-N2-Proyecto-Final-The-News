@@ -4,7 +4,7 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'sportshub.cbsistatic.com',
+                hostname: '**',
             },
         ],
     },
