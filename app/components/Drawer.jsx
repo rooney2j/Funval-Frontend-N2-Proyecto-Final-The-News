@@ -9,7 +9,7 @@ import SearchIcon from './svg/SearchIcon';
 
 import categories from '@/data/categories';
 
-export default function Drawer({ drawerOpen }) {
+export default function Drawer({ drawerOpen, setDrawerOpen }) {
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
 
   const toggleDropdown = () => {
@@ -32,9 +32,16 @@ export default function Drawer({ drawerOpen }) {
               </div>
             </div>
 
-            <div className='p-4'>
+            <button
+              className='p-4'
+              onClick={() => setDrawerOpen(false)}
+            >
               <Link href="/" className='text-white text-sm'>Home</Link>
-            </div>
+            </button>
+
+            {/* <div className='p-4'>
+              <Link href="/" className='text-white text-sm'>Home</Link>
+            </div> */}
 
             <button
               className='px-4 w-full flex justify-between items-center text-white text-sm'

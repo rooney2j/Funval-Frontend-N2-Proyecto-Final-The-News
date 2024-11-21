@@ -17,9 +17,16 @@ export default function MainHome() {
             }
         })
             .then((rs) => {
-                const firstTenResults = rs.data.articles.slice(0, 10);
-                console.log(firstTenResults);
-                setTopHeadlines(firstTenResults);
+                const firstResults = rs.data.articles.slice(0, 15);
+
+                // Alguna de las noticias puede tener su contenido removido
+                const firstResultsFilter = firstResults.filter((result) => {
+                    return result.title != '[Removed]'
+                })
+
+                console.log(firstResults);
+                console.log(firstResultsFilter);
+                setTopHeadlines(firstResultsFilter);
             })
             .catch(error => console.log(error));
     }, [])

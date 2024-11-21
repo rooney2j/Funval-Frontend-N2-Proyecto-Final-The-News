@@ -110,6 +110,7 @@ export default function Header() {
 
                     <Drawer
                         drawerOpen={drawerOpen}
+                        setDrawerOpen={setDrawerOpen}
                     />
                 </div>
             </header>
