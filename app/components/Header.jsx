@@ -6,28 +6,72 @@ import Burger from './svg/Burger'
 import SearchIcon from './svg/SearchIcon';
 import Link from 'next/link';
 import CloseIcon from './svg/CloseIcon';
-import DropdownCloseIcon from './svg/DropdownCloseIcon';
-import DropdownOpenIcon from './svg/DropdownOpenIcon';
 import Drawer from './Drawer';
+
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [desktopSearchBarOpen, setDesktopSearchBarOpen] = useState(false);
+
+    // para la búsqueda
+    const [query, setQuery] = useState('');
+    const router = useRouter();
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (query.trim() != '') {
+            router.push(`/search?query=${encodeURIComponent(query)}`);
+            setDesktopSearchBarOpen(false);
+        }
+    }
 
     return (
         <>
+            {/* Header para la versión Desktop */}
             <header className='hidden md:flex h-16 justify-between bg-black text-white items-center'>
-                <div className='flex items-center'>
-                    <button className='h-full w-16 flex justify-center items-center'>
+                <div className='flex items-center relative'>
+                    <button className='h-full w-16 flex justify-center items-center text-black'
+                        onClick={() => setDrawerOpen(!drawerOpen)} disabled
+                    >
                         <Burger />
                     </button>
 
                     <div className='h-full flex items-center'>
-                        <button className='h-full w-16 flex justify-center items-center'>
+                        <button className='h-full w-16 flex justify-center items-center'
+                            onClick={() => setDesktopSearchBarOpen(true)}
+                        >
                             <SearchIcon />
                         </button>
 
                         <Link href="/" className='min-w-40 text-4xl font-extrabold'>The News</Link>
                     </div>
+
+                    {
+                        desktopSearchBarOpen ? (
+                            <div className='absolute top-0 left-0 z-20 flex items-center bg-black'>
+                                <button className='h-full w-16 flex justify-center items-center'
+                                    onClick={() => setDesktopSearchBarOpen(false)}
+                                >
+                                    <CloseIcon />
+                                </button>
+
+                                <form onSubmit={handleSearch} className='w-full bg-slate-600 flex items-center rounded-lg'>
+                                    <input type="text"
+                                        className='h-full w-full bg-slate-600 outline-none text-white font-medium p-3 rounded-e-lg'
+                                        placeholder='Search term'
+                                        onChange={(e) => {
+                                            setQuery(e.target.value)
+                                        }}
+                                    />
+
+                                    <button className='text-white px-2'>
+                                        <SearchIcon />
+                                    </button>
+                                </form>
+                            </div>
+                        ) : null
+                    }
                 </div>
 
                 <div className='overflow-auto no-scrollbar overscroll-auto pointer-events-auto transition-opacity duration-700 ease-in-out opacity-100'>
@@ -47,27 +91,7 @@ export default function Header() {
                 </menu>
             </header>
 
-            {/* <header className='md:hidden py-3 flex flex-col text-white bg-black'>
-                <div className='relative'>
-                    <div className='absolute top-2 left-2'>
-                        <Burger />
-                    </div>
-
-                    <h1 className='text-5xl w-full text-center font-extrabold'>The News</h1>
-                </div>
-
-                <p className='p-1 w-full text-center text-xs'>Wed, Nov 13, 2024</p>
-
-                <div className='pt-1 flex justify-center gap-12'>
-                    <button className='w-36 h-9 border rounded-md'>Login</button>
-                    <button className='w-36 border rounded-md bg-blue-600'>Subscribe</button>
-                </div>
-            </header>
-
-            <div className='md:hidden'>
-                <NavCategories />
-            </div> */}
-
+            {/* Header para la versión mobile */}
             <header className='GlobalNav md:hidden'>
                 <div id='new-nav' className='NewGlobalNav'>
                     <div className='css-rgzt88'>
@@ -102,7 +126,7 @@ export default function Header() {
                             </div>
 
                             {/* Categories */}
-                            <div className={drawerOpen ? 'hidden' :'h-10'}>
+                            <div className={drawerOpen ? 'hidden' : 'h-10'}>
                                 <NavCategories />
                             </div>
                         </div>

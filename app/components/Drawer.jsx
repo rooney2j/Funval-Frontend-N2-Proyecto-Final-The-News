@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link';
 
 import DropdownCloseIcon from './svg/DropdownCloseIcon';
@@ -8,13 +8,26 @@ import DropdownOpenIcon from './svg/DropdownOpenIcon';
 import SearchIcon from './svg/SearchIcon';
 
 import categories from '@/data/categories';
+import { useRouter } from 'next/navigation';
 
 export default function Drawer({ drawerOpen, setDrawerOpen }) {
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
 
+  // para la búsqueda
+  const [query, setQuery] = useState('');
+  const router = useRouter();
+
   const toggleDropdown = () => {
     setIsOpenDropdown(!isOpenDropdown);
   };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if(query.trim() != '') {
+      router.push(`/search?query=${encodeURIComponent(query)}`);
+      setDrawerOpen(false);
+    }
+  }
 
   return (
     <>
@@ -23,11 +36,17 @@ export default function Drawer({ drawerOpen, setDrawerOpen }) {
           <menu id='hamburger-menu' className='h-[calc(100vh-(56px+64px))] bg-black'>
             <div>
               <div className='px-4 py-4'>
-                <form action="" className='w-full bg-slate-600 flex items-center rounded-lg'>
+                <form onSubmit={handleSearch} className='w-full bg-slate-600 flex items-center rounded-lg'>
                   <div className='text-white pl-2'>
                     <SearchIcon />
                   </div>
-                  <input type="text" className='h-full w-full bg-slate-600 outline-none text-white font-medium p-3 rounded-e-lg' />
+                  <input type="text"
+                    className='h-full w-full bg-slate-600 outline-none text-white font-medium p-3 rounded-e-lg'
+                    placeholder='Search term'
+                    onChange={(e) => {
+                      setQuery(e.target.value)
+                    }}
+                  />
                 </form>
               </div>
             </div>

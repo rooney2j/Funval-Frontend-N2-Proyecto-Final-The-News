@@ -1,12 +1,17 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
 import { API_KEY } from '@/utils/apiKey';
 import Image from 'next/image';
 
+import Link from 'next/link';
+import { CurrentNewContext } from '@/context/CurrentNewContext';
+
 export default function MainHome() {
+    const { setCurrentNew } = useContext(CurrentNewContext);
+
     const [topHeadlines, setTopHeadlines] = useState([])
 
     useEffect(() => {
@@ -21,7 +26,7 @@ export default function MainHome() {
 
                 // Alguna de las noticias puede tener su contenido removido
                 const firstResultsFilter = firstResults.filter((result) => {
-                    return result.title != '[Removed]'
+                    return result.title != '[Removed]' && result.urlToImage;
                 })
 
                 console.log(firstResults);
@@ -41,12 +46,14 @@ export default function MainHome() {
     }
 
     return (
-        <main className="divide-y pb-8">
+        <main className="divide-y pb-8 md:px-64">
             {/* Noticia destacada 1 */}
             <article>
                 <div className="px-4">
                     {/* Título y descripción */}
-                    <h2 className="pt-3 text-3xl font-semibold">{topHeadlines[0] && topHeadlines[0].title}</h2>
+                    <Link href="/detail">
+                        <h2 className="pt-3 text-3xl font-semibold cursor-pointer hover:text-blue-600" onClick={() => setCurrentNew(topHeadlines[0])}>{topHeadlines[0] && topHeadlines[0].title}</h2>
+                    </Link>
                     <h3 className="pt-1 text-lg font-normal text-justify">{topHeadlines[0] && topHeadlines[0].description}</h3>
                 </div>
 
@@ -63,14 +70,16 @@ export default function MainHome() {
 
             {/* Noticia destacada 2 */}
             <article className="px-4 pb-10">
-                <h2 className="pt-1 text-xl font-semibold">{topHeadlines[1] && topHeadlines[1].title}</h2>
+                <Link href="/detail">
+                    <h2 className="pt-1 text-xl font-semibold cursor-pointer hover:text-blue-600" onClick={() => setCurrentNew(topHeadlines[1])}>{topHeadlines[1] && topHeadlines[1].title}</h2>
+                </Link>
                 <h3 className="pt-1 text-sm font-normal text-justify">{topHeadlines[1] && topHeadlines[1].description}</h3>
             </article>
 
             {/* El resto de noticias destacadas */}
             <div className="flex flex-wrap">
                 {/* Noticia destacada 3 */}
-                <article className="w-1/2 p-2 h-48 flex flex-col items-center">
+                <article className="w-1/2 p-2 h-48 md:h-64 flex flex-col items-center cursor-pointer" onClick={() => setCurrentNew(topHeadlines[2])}>
                     <div className="w-5/6 h-3/4 bg-red-200">
                         <Image
                             src={topHeadlines[2] && topHeadlines[2].urlToImage ? topHeadlines[2].urlToImage : '/images/default_image.png'}
@@ -80,10 +89,13 @@ export default function MainHome() {
                             className='h-full w-full object-cover'
                         />
                     </div>
-                    <h2 className="pt-1 text-sm font-medium text-center">{truncateText(topHeadlines[2]?.title, 10)}</h2>
+
+                    <Link href="/detail">
+                        <h2 className="pt-1 text-sm font-medium text-center hover:text-blue-600">{truncateText(topHeadlines[2]?.title, 10)}</h2>
+                    </Link>
                 </article>
 
-                <article className="w-1/2 p-2 h-48 flex flex-col items-center">
+                <article className="w-1/2 p-2 h-48 md:h-64 flex flex-col items-center cursor-pointer" onClick={() => setCurrentNew(topHeadlines[3])}>
                     <div className="w-5/6 h-3/4 bg-red-200">
                         <Image
                             src={topHeadlines[3] && topHeadlines[3].urlToImage ? topHeadlines[3].urlToImage : '/images/default_image.png'}
@@ -93,10 +105,13 @@ export default function MainHome() {
                             className='h-full w-full object-cover'
                         />
                     </div>
-                    <h2 className="pt-1 text-sm font-medium text-center">{truncateText(topHeadlines[3]?.title, 10)}</h2>
+
+                    <Link href="/detail">
+                        <h2 className="pt-1 text-sm font-medium text-center hover:text-blue-600">{truncateText(topHeadlines[3]?.title, 10)}</h2>
+                    </Link>
                 </article>
 
-                <article className="w-1/2 p-2 h-48 flex flex-col items-center">
+                <article className="w-1/2 p-2 h-48 md:h-64 flex flex-col items-center">
                     <div className="w-5/6 h-3/4 bg-red-200">
                         <Image
                             src={topHeadlines[4] && topHeadlines[4].urlToImage ? topHeadlines[4].urlToImage : '/images/default_image.png'}
@@ -106,10 +121,12 @@ export default function MainHome() {
                             className='h-full w-full object-cover'
                         />
                     </div>
-                    <h2 className="pt-1 text-sm font-medium text-center">{truncateText(topHeadlines[4]?.title, 10)}</h2>
+                    <Link href="/detail">
+                        <h2 className="pt-1 text-sm font-medium text-center cursor-pointer hover:text-blue-600" onClick={() => setCurrentNew(topHeadlines[4])}>{truncateText(topHeadlines[4]?.title, 10)}</h2>
+                    </Link>
                 </article>
 
-                <article className="w-1/2 p-2 h-48 flex flex-col items-center">
+                <article className="w-1/2 p-2 h-48 md:h-64 flex flex-col items-center">
                     <div className="w-5/6 h-3/4 bg-red-200">
                         <Image
                             src={topHeadlines[5] && topHeadlines[5].urlToImage ? topHeadlines[5].urlToImage : '/images/default_image.png'}
@@ -119,10 +136,13 @@ export default function MainHome() {
                             className='h-full w-full object-cover'
                         />
                     </div>
-                    <h2 className="pt-1 text-sm font-medium text-center">{truncateText(topHeadlines[5]?.title, 10)}</h2>
+
+                    <Link href="/detail">
+                    <h2 className="pt-1 text-sm font-medium text-center cursor-pointer hover:text-blue-600" onClick={() => setCurrentNew(topHeadlines[5])}>{truncateText(topHeadlines[5]?.title, 10)}</h2>
+                    </Link>
                 </article>
 
-                <article className="w-1/2 p-2 h-48 flex flex-col items-center">
+                <article className="w-1/2 p-2 h-48 md:h-64 flex flex-col items-center">
                     <div className="w-5/6 h-3/4 bg-red-200">
                         <Image
                             src={topHeadlines[6] && topHeadlines[6].urlToImage ? topHeadlines[6].urlToImage : '/images/default_image.png'}
@@ -132,10 +152,13 @@ export default function MainHome() {
                             className='h-full w-full object-cover'
                         />
                     </div>
-                    <h2 className="pt-1 text-sm font-medium text-center">{truncateText(topHeadlines[6]?.title, 10)}</h2>
+
+                    <Link href="/detail">
+                    <h2 className="pt-1 text-sm font-medium text-center cursor-pointer hover:text-blue-600" onClick={() => setCurrentNew(topHeadlines[6])}>{truncateText(topHeadlines[6]?.title, 10)}</h2>
+                    </Link>
                 </article>
 
-                <article className="w-1/2 p-2 h-48 flex flex-col items-center">
+                <article className="w-1/2 p-2 h-48 md:h-64 flex flex-col items-center">
                     <div className="w-5/6 h-3/4 bg-red-200">
                         <Image
                             src={topHeadlines[7] && topHeadlines[7].urlToImage ? topHeadlines[7].urlToImage : '/images/default_image.png'}
@@ -145,10 +168,13 @@ export default function MainHome() {
                             className='h-full w-full object-cover'
                         />
                     </div>
-                    <h2 className="pt-1 text-sm font-medium text-center">{truncateText(topHeadlines[7]?.title, 10)}</h2>
+
+                    <Link href="/detail">
+                    <h2 className="pt-1 text-sm font-medium text-center cursor-pointer hover:text-blue-600" onClick={() => setCurrentNew(topHeadlines[7])}>{truncateText(topHeadlines[7]?.title, 10)}</h2>
+                    </Link>
                 </article>
 
-                <article className="w-1/2 p-2 h-48 flex flex-col items-center">
+                <article className="w-1/2 p-2 h-48 md:h-64 flex flex-col items-center">
                     <div className="w-5/6 h-3/4 bg-red-200">
                         <Image
                             src={topHeadlines[8] && topHeadlines[8].urlToImage ? topHeadlines[8].urlToImage : '/images/default_image.png'}
@@ -158,10 +184,13 @@ export default function MainHome() {
                             className='h-full w-full object-cover'
                         />
                     </div>
-                    <h2 className="pt-1 text-sm font-medium text-center">{truncateText(topHeadlines[8]?.title, 10)}</h2>
+
+                    <Link href="/detail">
+                    <h2 className="pt-1 text-sm font-medium text-center cursor-pointer hover:text-blue-600" onClick={() => setCurrentNew(topHeadlines[8])}>{truncateText(topHeadlines[8]?.title, 10)}</h2>
+                    </Link>
                 </article>
 
-                <article className="w-1/2 p-2 h-48 flex flex-col items-center">
+                <article className="w-1/2 p-2 h-48 md:h-64 flex flex-col items-center">
                     <div className="w-5/6 h-3/4 bg-red-200">
                         <Image
                             src={topHeadlines[9] && topHeadlines[9].urlToImage ? topHeadlines[9].urlToImage : '/images/default_image.png'}
@@ -171,7 +200,10 @@ export default function MainHome() {
                             className='h-full w-full object-cover'
                         />
                     </div>
-                    <h2 className="pt-1 text-sm font-medium text-center">{truncateText(topHeadlines[9]?.title, 10)}</h2>
+
+                    <Link href="/detail">
+                    <h2 className="pt-1 text-sm font-medium text-center cursor-pointer hover:text-blue-600" onClick={() => setCurrentNew(topHeadlines[9])}>{truncateText(topHeadlines[9]?.title, 10)}</h2>
+                    </Link>
                 </article>
             </div>
         </main>

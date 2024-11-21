@@ -7,6 +7,7 @@ import Image from 'next/image'
 import dayjs from 'dayjs';
 
 import { faker } from '@faker-js/faker';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // Función para formatear la fecha al estilo dd/MM/YYYY
 const formatDate = (date) => {

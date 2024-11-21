@@ -1,17 +1,28 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import SearchIcon from '../components/svg/SearchIcon'
+import { useSearchParams } from 'next/navigation';
+
+import { API_KEY } from '@/utils/apiKey';
+import axios from 'axios';
 
 import dayjs from 'dayjs';
 
 import { faker } from '@faker-js/faker';
+import Link from 'next/link';
+import { CurrentNewContext } from '@/context/CurrentNewContext';
 
 // Función para formatear la fecha al estilo dd/MM/YYYY
 const formatDate = (date) => {
     let fecha = dayjs(date);
     return fecha.format('dddd, MMMM D, YYYY');
 };
+
+const formatDateforSearch = (date) => {
+    let fecha = dayjs(date);
+    return fecha.format('YYYY-MM-DD')
+}
 
 let fakeNewsIdCounter = 1;
 
@@ -21,26 +32,71 @@ const templateFakeNew = () => ({
     title: faker.lorem.sentence({ min: 10, max: 18 }),
     author: faker.person.fullName(),
     description: faker.lorem.sentence({ min: 18, max: 36 }),
-    published_at: formatDate(dayjs(faker.date.past())),
-    source: faker.lorem.sentence({ min: 1, max: 4 }),
+    publishedAt: formatDate(dayjs(faker.date.past())),
+    source: {
+        name: faker.lorem.sentence({ min: 1, max: 4 })
+    },
 });
 
 // Función para generar datos falsos para la tabla
 const createFakeNews = (numberOfFakeNews = 5) => Array.from({ length: numberOfFakeNews }, templateFakeNew);
 
 export default function page() {
-    // Simulación de registros
+    // Búsqueda de resultados según el parámetro obtenido por useRouter
+    const searchParams = useSearchParams();
+    const query = searchParams.get('query');
+
+    const [searchTerm, setSearchTerm] = useState(query || ''); // Inicializa con el parámetro de búsqueda o vacío
+
     const [allData, setAllData] = useState([]);
 
+    // Paginación
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;    // registros por página
     const maxPageButtons = 7;   // máximo número de botones visibles en la paginación
 
+    // Para actualizar la noticia a nivel global
+    const { setCurrentNew } = useContext(CurrentNewContext);
+
     useEffect(() => {
-        // Generar n datos falsos
-        const generatedFakeNews = createFakeNews(87);
-        setAllData(generatedFakeNews);
-    }, [])
+        const timer = setTimeout(() => {
+            if (searchTerm) {
+                fetchData(searchTerm);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    const fetchData = (term) => {
+        axios.get('https://newsapi.org/v2/everything', {
+            params: {
+                q: term,
+                from: formatDateforSearch(dayjs().subtract(1, 'day')),
+                sortBy: 'popularity',
+                apiKey: API_KEY,
+            }
+        })
+            .then((rs) => {
+                const arrayResults = rs.data.articles;
+
+                console.log(arrayResults);
+                // Alguna de las noticias puede tener su contenido removido
+                const filteredResults = arrayResults.filter((result) => {
+                    return result.title != '[Removed]';
+                })
+
+                console.log(filteredResults);
+                setAllData(filteredResults);
+            })
+            .catch(error => console.log(error));
+    }
+
+    useEffect(() => {
+        if (query) {
+            setSearchTerm(query); // Actualiza el término si viene del parámetro
+        }
+    }, [query]);
 
     // Calcular los datos para la página actual
     const totalPages = Math.ceil(allData.length / itemsPerPage);
@@ -74,21 +130,27 @@ export default function page() {
         <>
             {/* El tamaño mínimo del componente es el del viewport, sin considerar el header y el footer */}
             <div className='min-h-[calc(100vh-(56px+64px+128px))] p-4 md:px-48'>
-                <form action="" className='w-full flex items-center border'>
-                    <input type='search' placeholder='Search' className='w-full p-3 outline-none' />
+                <form action="" className='w-full flex items-center border' onSubmit={(e) => e.preventDefault()}>
+                    <input type='search' placeholder='Search' className='w-full p-3 outline-none'
+                    value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                     <button id='searchBtn' type='submit' className='text-white border bg-blue-400 p-4'>
                         <SearchIcon />
                     </button>
                 </form>
 
-                <p className='text-xs mb-6'>Your search for &apos;<span className='font-medium'>apple</span>&apos; returned <span className='font-medium'>{allData.length}</span> results</p>
+                <p className='text-xs mb-6'>Your search for &apos;<span className='font-medium'>{query}</span>&apos; returned <span className='font-medium'>{allData.length}</span> results</p>
 
                 <div className='space-y-4'>
                     {currentData.map((news, index) => (
                         <article key={index} className='p-4 border rounded-lg shadow hover:shadow-md transition'>
-                            <h2 className='text-lg font-semibold text-blue-600 mb-1'>
-                                {news.title}
-                            </h2>
+                            <Link href="/detail">
+                                <h2 className='text-lg font-semibold text-blue-600 mb-1 cursor-pointer'
+                                    onClick={() => setCurrentNew(news)}
+                                >
+                                    {news.title}
+                                </h2>
+                            </Link>
 
                             <p className="text-gray-500 text-xs mb-2">
                                 {news.author}
@@ -99,7 +161,7 @@ export default function page() {
                             </p>
 
                             <p className="pt-3 text-gray-500 text-sm mb-2">
-                                {news.published_at} &#124; <span className='text-xs text-gray-500'>{news.source}</span>
+                                {news.publishedAt} &#124; <span className='text-xs text-gray-500'>{news.source?.name}</span>
                             </p>
                         </article>
                     ))}
