@@ -23,11 +23,18 @@ export default function Drawer({ drawerOpen, setDrawerOpen }) {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if(query.trim() != '') {
+    if (query.trim() != '') {
       router.push(`/search?query=${encodeURIComponent(query)}`);
       setDrawerOpen(false);
     }
   }
+
+  // Maneja el clic en una categoría
+  const handleCategoryClick = (category) => {
+    // Redirige a la página /search con el parámetro correspondiente
+    router.push(`/search?query=${encodeURIComponent(category)}`);
+    setDrawerOpen(false);
+  };
 
   return (
     <>
@@ -58,10 +65,6 @@ export default function Drawer({ drawerOpen, setDrawerOpen }) {
               <Link href="/" className='text-white text-sm'>Home</Link>
             </button>
 
-            {/* <div className='p-4'>
-              <Link href="/" className='text-white text-sm'>Home</Link>
-            </div> */}
-
             <button
               className='px-4 w-full flex justify-between items-center text-white text-sm'
               onClick={toggleDropdown}
@@ -80,7 +83,11 @@ export default function Drawer({ drawerOpen, setDrawerOpen }) {
               <ul className='py-3 flex flex-col gap-3 text-sm'>
                 {
                   categories.map((category, index) => (
-                    <li key={index} className='px-8 capitalize cursor-pointer text-white'>{category}</li>
+                    <li key={index} className='px-8 capitalize cursor-pointer text-white'
+                      onClick={() => handleCategoryClick(category)}
+                    >
+                      {category}
+                    </li>
                   ))
                 }
               </ul>
